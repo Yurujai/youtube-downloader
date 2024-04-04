@@ -81,14 +81,14 @@ class YouTubeDownloader
                 "client" => [
                     "androidSdkVersion" => 30,
                     "clientName" => "ANDROID",
-                    "clientVersion" => "17.31.35",
+                    "clientVersion" => "19.09.37",
                     "hl" => "en",
                     "timeZone" => "UTC",
-                    "userAgent" => "com.google.android.youtube/17.31.35 (Linux; U; Android 11) gzip",
+                    "userAgent" => "com.google.android.youtube/19.09.37 (Linux; U; Android 11) gzip",
                     "utcOffsetMinutes" => 0
                 ]
             ],
-            "params" => "CgIQBg==",
+            "params" => "CgIIAQ==",
             "videoId" => $video_id,
             "playbackContext" => [
                 "contentPlaybackContext" => [
@@ -141,6 +141,11 @@ class YouTubeDownloader
         // the most reliable way of fetching all download links no matter what
         // query: /youtubei/v1/player for some additional data
         $player_response = $this->getPlayerApiResponse($video_id, $youtube_config_data);
+
+        // throws exception if player response does not belong to the requested video
+        preg_match('/"videoId":\s"([^"]+)"/', print_r($player_response, true), $matches);
+        if ($matches[1] != $video_id)
+            throw new YouTubeException('Invalid player response: got player response for video "' . $matches[1] . '" instead of "' . $video_id .'"');
 
         // get player.js location that holds URL signature decipher function
         $player_url = $page->getPlayerScriptUrl();
